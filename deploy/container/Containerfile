@@ -1,7 +1,17 @@
-FROM docker.io/alpine
+FROM docker.io/alpine:latest
 
+# Install packages
 RUN apk add --update-cache \
     rsync \
     openssh-client \
     tzdata \
-  && rm -rf /var/cache/apk/*
+ && rm -rf /var/cache/apk/*
+
+# Create a group with GID 2000
+RUN addgroup -g 2000 home
+
+# Create a user with UID 1000 and add to the group
+RUN adduser -D -u 1000 -G home coen
+
+# Switch to the new user
+USER coen
