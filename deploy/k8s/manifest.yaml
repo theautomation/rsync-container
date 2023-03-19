@@ -1,0 +1,46 @@
+# Example
+
+---
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  name: immich-photo-backup
+  namespace: tools
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: immich-photo-backup
+              image: busybox:1.28
+              imagePullPolicy: Always
+              restartPolicy: OnFailure
+              command:
+                - /bin/sh
+                - -c
+                - persons=("coen" "anne"); for person in ${persons[@]}; do rsync -a --stats --verbose /root/source/${person} /root/backup/${person}; done
+          volumeMounts:
+            - name: library-coen
+              mountPath: /root/source/coen
+            - name: library-coen-backup
+              mountPath: /root/backup/coen
+            - name: library-anne
+              mountPath: /root/source/anne
+            - name: library-anne-backup
+              mountPath: /root/backup/anne
+        restartPolicy: OnFailure
+        volumes:
+          - name: library-coen
+            persistentVolumeClaim:
+              claimName: pvc-nfs-immich-library-coen
+          - name: library-coen-backup
+            persistentVolumeClaim:
+              claimName: pvc-nfs-immich-library-coen-backup
+          - name: library-anne
+            persistentVolumeClaim:
+              claimName: pvc-nfs-immich-library-anne
+          - name: library-anne-backup
+            persistentVolumeClaim:
+              claimName: pvc-nfs-immich-library-anne-backup
