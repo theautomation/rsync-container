@@ -5,13 +5,11 @@ RUN apk add --update-cache \
     rsync \
     openssh-client \
     tzdata \
- && rm -rf /var/cache/apk/*
+    && rm -rf /var/cache/apk/*
 
-# Create a group with GID 2000
-RUN addgroup -g 2000 home
+# Create group and users and add users to group
+RUN addgroup -g 2000 home \
+    && adduser -D -u 1000 -G home coen \
+    && adduser -D -u 1001 -G home anne
 
-# Create a user with UID 1000 and add to the group
-RUN adduser -D -u 1000 -G home coen
-
-# Switch to the new user
 USER coen
